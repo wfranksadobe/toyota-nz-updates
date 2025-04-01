@@ -16,7 +16,6 @@ import {
   ORDER_STATUS_PATH,
   CUSTOMER_PATH, SALES_GUEST_VIEW_PATH, SALES_ORDER_VIEW_PATH,
 } from '../constants.js';
-import { rootLink } from '../scripts.js';
 
 await initializeDropin(async () => {
   const { pathname, searchParams } = new URL(window.location.href);
@@ -103,7 +102,14 @@ async function handleUserOrdersRedirects(
         : `${CUSTOMER_ORDER_DETAILS_PATH}?orderRef=${orderRef}`;
     }
   } else {
-    targetPath = !orderRef ? ORDER_STATUS_PATH : null;
+    // XWalk: prevent redirect on author if there is no valid order/token
+    // otherwise the page cant be edited eg. return-details, create-return
+    // eslint-disable-next-line no-lonely-if
+    if (window.xwalk?.isAuthorEnv) {
+      targetPath = null;
+    } else {
+      targetPath = !orderRef ? ORDER_STATUS_PATH : null;
+    }
   }
 
   if (targetPath) {

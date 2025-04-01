@@ -74,6 +74,40 @@ function buildHeroBlock(main) {
 }
 
 /**
+ * Moves all the attributes from a given element to another given element.
+ * @param {Element} from the element to copy attributes from
+ * @param {Element} to the element to copy attributes to
+ */
+export function moveAttributes(from, to, attributes) {
+  if (!attributes) {
+    // eslint-disable-next-line no-param-reassign
+    attributes = [...from.attributes].map(({ nodeName }) => nodeName);
+  }
+  attributes.forEach((attr) => {
+    const value = from.getAttribute(attr);
+    if (value) {
+      to.setAttribute(attr, value);
+      from.removeAttribute(attr);
+    }
+  });
+}
+
+/**
+ * Move instrumentation attributes from a given element to another given element.
+ * @param {Element} from the element to copy attributes from
+ * @param {Element} to the element to copy attributes to
+ */
+export function moveInstrumentation(from, to) {
+  moveAttributes(
+    from,
+    to,
+    [...from.attributes]
+      .map(({ nodeName }) => nodeName)
+      .filter((attr) => attr.startsWith('data-aue-') || attr.startsWith('data-richtext-')),
+  );
+}
+
+/**
  * load fonts.css and set a session storage flag
  */
 async function loadFonts() {
@@ -103,7 +137,8 @@ function autolinkModals(element) {
  */
 function buildAutoBlocks(main) {
   try {
-    buildHeroBlock(main);
+    // TODO: Auto blocking not supported by crosswalk
+    // buildHeroBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -115,6 +150,7 @@ function buildAutoBlocks(main) {
  * @param {Element} main The container element
  */
 function buildTemplateColumns(doc) {
+  document.body.classList.add('columns');
   const columns = doc.querySelectorAll('main > div.section[data-column-width]');
 
   columns.forEach((column) => {
@@ -134,9 +170,12 @@ function buildTemplateColumns(doc) {
 }
 
 async function applyTemplates(doc) {
-  if (doc.body.classList.contains('columns')) {
-    buildTemplateColumns(doc);
-  }
+  const templates = ['account', 'orders', 'address', 'returns', 'account-order-details'];
+  templates.forEach((template) => {
+    if (doc.body.classList.contains(template)) {
+      buildTemplateColumns(doc);
+    }
+  });
 }
 
 /**

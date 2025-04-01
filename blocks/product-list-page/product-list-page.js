@@ -4,7 +4,7 @@ import { rootLink } from '../../scripts/scripts.js';
 
 export default async function decorate(block) {
   // eslint-disable-next-line import/no-absolute-path, import/no-unresolved
-  await import('/scripts/widgets/search.js');
+  await import('../../scripts/widgets/search.js');
 
   const { category, urlpath, type } = readBlockConfig(block);
   block.textContent = '';
