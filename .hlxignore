@@ -11,3 +11,4 @@ build.mjs
 tools/picker/src/*
 cypress/
 tools/pdp-metadata/*
+_*
