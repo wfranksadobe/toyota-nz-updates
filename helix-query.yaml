@@ -32,7 +32,7 @@ indices:
         select: none
         value: parseTimestamp(headers["last-modified"], "ddd, DD MMM YYYY hh:mm:ss GMT")
   enrichment:
-    target: /enrichment/enrichment.json
+    target: "s3://enrichment/enrichment.json"
     include:
       - '**/enrichment/**'
     properties:
