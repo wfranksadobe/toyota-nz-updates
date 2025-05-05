@@ -12,7 +12,7 @@ let rootConfig = null;
  * @returns {URL} - The URL for the config file.
  */
 function buildConfigURL() {
-  return new URL(`${window.hlx.codeBasePath}/config.json`);
+  return new URL(`${window.location.origin}${window.hlx.codeBasePath}/config.json`);
 }
 
 /**
