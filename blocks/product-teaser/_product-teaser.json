@@ -35,7 +35,10 @@
           "description": "SKU to display",
           "commerce-picker": {
             "selection-mode": "single",
-            "selection-type": "item"
+            "selection-type": "item",
+            "category-query": {
+              "roles": []
+            }
           }
         },
         {
