@@ -27,12 +27,16 @@
       "fields":
       [
         {
-          "component": "text",
+          "component": "commerce-picker:picker",
           "name": "sku",
           "label": "SKU",
           "valueType": "string",
           "value": "",
-          "description": "SKU to display"
+          "description": "SKU to display",
+          "commerce-picker": {
+            "selection-mode": "single",
+            "selection-type": "item"
+          }
         },
         {
           "component": "boolean",
