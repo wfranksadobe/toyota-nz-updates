@@ -4,6 +4,7 @@ import { initialize, setFetchGraphQlHeaders } from '@dropins/storefront-order/ap
 import { checkIsAuthenticated, getHeaders } from '../configs.js';
 import { initializeDropin } from './index.js';
 import { fetchPlaceholders } from '../commerce.js';
+import { rootLink } from '../scripts.js';
 
 import {
   CUSTOMER_ORDER_DETAILS_PATH,
