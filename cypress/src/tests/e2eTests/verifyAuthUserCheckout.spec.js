@@ -100,7 +100,7 @@ describe('Verify auth user can place order', () => {
       'Youth tee',
       '/products/youth-tee/ADB150'
     )('.cart-mini-cart');
-    assertProductImage('/ADB150.jpg')('.cart-mini-cart');
+    assertProductImage(Cypress.env('productImageName'))('.cart-mini-cart');
     assertCartSummaryProduct(
       'Cypress Configurable product latest',
       'CYPRESS456',
@@ -113,7 +113,7 @@ describe('Verify auth user can place order', () => {
       'Cypress Configurable product latest',
       '/products/cypress-configurable-product-latest/CYPRESS456'
     )('.cart-mini-cart');
-    assertProductImage('/thumbnail.jpg')('.cart-mini-cart');
+    assertProductImage(Cypress.env('productImageName'))('.cart-mini-cart');
     cy.contains('View Cart').click();
     assertCartSummaryProduct(
       'Youth tee',
@@ -127,7 +127,7 @@ describe('Verify auth user can place order', () => {
       'Youth tee',
       '/products/youth-tee/ADB150'
     )('.commerce-cart-wrapper');
-    assertProductImage('/ADB150.jpg')('.commerce-cart-wrapper');
+    assertProductImage(Cypress.env('productImageName'))('.commerce-cart-wrapper');
 
     assertCartSummaryProduct(
       'Cypress Configurable product latest',
@@ -199,7 +199,6 @@ describe('Verify auth user can place order', () => {
       const orderRef = url.split('?')[1];
       cy.visit('/order-details?' + orderRef)
     })
-
     // CANCEL ORDER
     cy.get(fields.cancelButton).should('exist');
     cy.get(fields.cancelButton).click();
