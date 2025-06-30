@@ -510,7 +510,7 @@ export async function fetchPlaceholders(path) {
  * @returns {Promise<Object>} - The config JSON from session storage
  */
 export async function getConfigFromSession() {
-  const configURL = `${window.location.origin}/config.json`;
+  const configURL = new URL(`${window.hlx.codeBasePath}/config.json`,window.location);
 
   try {
     const configJSON = window.sessionStorage.getItem('config');
