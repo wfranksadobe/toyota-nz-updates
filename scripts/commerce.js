@@ -396,8 +396,9 @@ export async function fetchPlaceholders(path) {
         return window.placeholders._pending[resourceCacheKey];
       }
 
-      // Create new fetch promise
-      const resourceFetchPromise = fetch(`${url}?sheet=data`).then(async (response) => {
+      // Create new fetch promise¨
+      // XWALK: no sheet parameter
+      const resourceFetchPromise = fetch(`${url}`).then(async (response) => {
         if (response.ok) {
           const data = await response.json();
           // Cache the response
