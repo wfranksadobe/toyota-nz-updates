@@ -308,6 +308,17 @@
     ]
   },
   {
+    "id": "wishlist",
+    "fields": [
+      {
+        "component": "aem-content",
+        "name": "start-shopping-url",
+        "label": "Start Shopping URL",
+        "description": "Start Shopping URL"
+      }
+    ]
+  },
+  {
     "id": "enrichment",
     "fields": [
       {
@@ -745,6 +756,19 @@
         "label": "Template",
         "valueType": "string",
         "value": "create-password",
+        "readOnly": true
+      }
+    ]
+  },
+  {
+    "id": "wishlist-metadata",
+    "fields": [
+      {
+        "component": "text",
+        "name": "template",
+        "label": "Template",
+        "valueType": "string",
+        "value": "wishlist",
         "readOnly": true
       }
     ]

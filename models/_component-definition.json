@@ -143,6 +143,15 @@
           "...": "../blocks/commerce-create-return/_*.json#/definitions"
         }
       ]
+    },
+    {
+      "title": "Wishlist",
+      "id": "wishlist",
+      "components": [
+        {
+          "...": "../blocks/commerce-wishlist/_*.json#/definitions"
+        }
+      ]
     }
   ]
 }

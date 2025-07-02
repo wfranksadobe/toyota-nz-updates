@@ -349,6 +349,20 @@
           "readOnly": true
         }
       ]
+    },
+    {
+      "id": "wishlist-metadata",
+      "fields":
+      [
+        {
+          "component": "text",
+          "name": "template",
+          "label": "Template",
+          "valueType": "string",
+          "value": "wishlist",
+          "readOnly": true
+        }
+      ]
     }
   ]
 }

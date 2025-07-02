@@ -285,6 +285,13 @@
         {"...": "./_common-blocks.json"},
         "commerce-create-password"
       ]
+    },
+    {
+      "id": "wishlist-section",
+      "components": [
+        {"...": "./_common-blocks.json"},
+        "commerce-wishlist"
+      ]
     }
   ]
 }
