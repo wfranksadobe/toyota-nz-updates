@@ -2,7 +2,7 @@
   "definitions": [
     {
       "title": "Wishlist",
-      "id": "wishlist",
+      "id": "commerce-wishlist",
       "plugins": {
         "xwalk": {
           "page": {
@@ -19,7 +19,7 @@
   ],
   "models": [
     {
-      "id": "wishlist",
+      "id": "commerce-wishlist",
       "fields": [
         {
           "component": "aem-content",

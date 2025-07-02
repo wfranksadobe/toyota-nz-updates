@@ -308,7 +308,7 @@
     ]
   },
   {
-    "id": "wishlist",
+    "id": "commerce-wishlist",
     "fields": [
       {
         "component": "aem-content",
