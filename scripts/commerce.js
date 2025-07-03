@@ -292,7 +292,7 @@ export async function initializeCommerce() {
 export function rootLink(link) {
   const root = getRootPath().replace(/\/$/, '');
 
-  // XWALK: we need to the site path add the .html extension to the link
+  // XWALK: we need to add the site path andthe .html extension to the link
   // if we are in the author environment
   const aemContentRoot = window.hlx.codeBasePath.split('.')[0];
   const ext = window.xwalk?.isAuthorEnv ? '.html':'';
@@ -330,9 +330,14 @@ function buildTemplateColumns(doc) {
  * @param {Element} doc The document element
  */
 export function applyTemplates(doc) {
-  if (doc.body.classList.contains('columns')) {
-    buildTemplateColumns(doc);
-  }
+  // Xwalk: use templates to apply columns to the document
+  const templates = ['account', 'orders', 'address', 'returns', 'account-order-details'];
+  templates.forEach((template) => {
+    if (doc.body.classList.contains(template)) {
+      buildTemplateColumns(doc);
+      doc.body.classList.add('columns');
+    }
+  });
 }
 
 /**
