@@ -13,6 +13,12 @@ import {
 // Initialize
 import '../../scripts/initializers/auth.js';
 
+  // Xwalk: if in AEM author and not authenticated show placeholder instead
+  if (window.xwalk?.isAuthorEnv && !checkIsAuthenticated()) {
+    block.classList.add('placeholder');
+    return;
+  }
+  
 export default async function decorate(block) {
   if (checkIsAuthenticated()) {
     window.location.href = rootLink(CUSTOMER_ACCOUNT_PATH);
