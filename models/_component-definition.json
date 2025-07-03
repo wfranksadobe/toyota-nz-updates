@@ -90,6 +90,9 @@
         },
         {
           "...": "../blocks/commerce-search-order/_*.json#/definitions"
+        },
+        {
+          "...": "../blocks/commerce-gift-options/_*.json#/definitions"
         }
       ]
     },
