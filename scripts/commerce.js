@@ -292,9 +292,14 @@ export async function initializeCommerce() {
 export function rootLink(link) {
   const root = getRootPath().replace(/\/$/, '');
 
+  // XWALK: we need to the site path add the .html extension to the link
+  // if we are in the author environment
+  const aemContentRoot = window.hlx.codeBasePath.split('.')[0];
+  const ext = window.xwalk?.isAuthorEnv ? '.html':'';
+  
   // If the link is already localized, do nothing
-  if (link.startsWith(root)) return link;
-  return `${root}${link}`;
+  if (link.startsWith(root)) return `${aemContentRoot}${link}${ext}`;
+  return `${aemContentRoot}${root}${link}${html}`;
 }
 
 /**
