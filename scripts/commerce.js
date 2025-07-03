@@ -290,16 +290,23 @@ export async function initializeCommerce() {
  * @returns {string} - The localized link
  */
 export function rootLink(link) {
-  const root = getRootPath().replace(/\/$/, '');
-
-  // XWALK: we need to add the site path andthe .html extension to the link
-  // if we are in the author environment
+  // XWALK: we need to add the site path if set
   const aemContentRoot = window.hlx.codeBasePath.split('.')[0];
-  const ext = window.xwalk?.isAuthorEnv ? '.html':'';
+  const root = `${aemContentRoot}${getRootPath().replace(/\/$/, '')}`;
+  
+  // If it's an absolute URL, extract the pathname
+  if (link.startsWith('http://') || link.startsWith('https://')) {
+    const url = new URL(link);
+    link = url.pathname;
+  }
+  // append the site path to link
+  link = link.startsWith(aemContentRoot)? link: `${aemContentRoot}${link}`;
+  // append the .html extension to link if we are in the author environment
+  link = window.xwalk?.isAuthorEnv && !link.endsWith('.html') ? `${link}.html`: link;
   
   // If the link is already localized, do nothing
-  if (link.startsWith(root)) return `${aemContentRoot}${link}${ext}`;
-  return `${aemContentRoot}${root}${link}${html}`;
+  if (link.startsWith(root)) return link;
+  return `${root}${link}`;
 }
 
 /**
