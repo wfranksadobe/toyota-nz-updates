@@ -293,17 +293,18 @@ export function rootLink(link) {
   // XWALK: we need to add the site path if set
   const aemContentRoot = window.hlx.codeBasePath.split('.')[0];
   const root = `${aemContentRoot}${getRootPath().replace(/\/$/, '')}`;
-  
+
   // If it's an absolute URL, extract the pathname
+  /* eslint-disable no-param-reassign */
   if (link.startsWith('http://') || link.startsWith('https://')) {
     const url = new URL(link);
     link = url.pathname;
   }
   // append the site path to link
-  link = link.startsWith(aemContentRoot)? link: `${aemContentRoot}${link}`;
+  link = link.startsWith(aemContentRoot) ? link : `${aemContentRoot}${link}`;
   // append the .html extension to link if we are in the author environment
-  link = window.xwalk?.isAuthorEnv && !link.endsWith('.html') ? `${link}.html`: link;
-  
+  link = window.xwalk?.isAuthorEnv && !link.endsWith('.html') ? `${link}.html` : link;
+  /* eslint-enable no-param-reassign */
   // If the link is already localized, do nothing
   if (link.startsWith(root)) return link;
   return `${root}${link}`;
@@ -528,7 +529,7 @@ export async function fetchPlaceholders(path) {
  * @returns {Promise<Object>} - The config JSON from session storage
  */
 export async function getConfigFromSession() {
-  const configURL = new URL(`${window.hlx.codeBasePath}/config.json`,window.location);
+  const configURL = new URL(`${window.hlx.codeBasePath}/config.json`, window.location);
 
   try {
     const configJSON = window.sessionStorage.getItem('config');
