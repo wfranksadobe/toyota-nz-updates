@@ -149,6 +149,7 @@
         "commerce-shipping-status",
         "commerce-customer-details",
         "commerce-order-cost-summary",
+        "commerce-gift-options",
         "commerce-order-product-list",
         "commerce-order-returns",
         "product-teaser",
@@ -284,6 +285,13 @@
       "components": [
         {"...": "./_common-blocks.json"},
         "commerce-create-password"
+      ]
+    },
+    {
+      "id": "wishlist-section",
+      "components": [
+        {"...": "./_common-blocks.json"},
+        "commerce-wishlist"
       ]
     }
   ]
