@@ -1,12 +1,12 @@
 {
   "mappings": [
-    "/content/universal-editor-test/:/",
-    "/content/universal-editor-test/configuration:/.helix/config.json",
-    "/content/universal-editor-test/headers:/.helix/headers.json",
-    "/content/universal-editor-test/metadata:/metadata.json",
-    "/content/universal-editor-test.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
+    "/content/Toyota_Demo/:/",
+    "/content/Toyota_Demo/configuration:/.helix/config.json",
+    "/content/Toyota_Demo/headers:/.helix/headers.json",
+    "/content/Toyota_Demo/metadata:/metadata.json",
+    "/content/Toyota_Demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
   ],
   "includes": [
-    "/content/universal-editor-test/"
+    "/content/Toyota_Demo/"
   ]
 }
