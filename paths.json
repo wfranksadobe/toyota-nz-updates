@@ -7,6 +7,6 @@
     "/content/toyota_demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
   ],
   "includes": [
-    "/content/toyota_Demo/"
+    "/content/toyota_demo/"
   ]
 }
