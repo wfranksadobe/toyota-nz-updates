@@ -1,12 +1,12 @@
 {
   "mappings": [
-    "/content/Toyota_Demo/:/",
-    "/content/Toyota_Demo/configuration:/.helix/config.json",
-    "/content/Toyota_Demo/headers:/.helix/headers.json",
-    "/content/Toyota_Demo/metadata:/metadata.json",
-    "/content/Toyota_Demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
+    "/content/toyota_Demo/:/",
+    "/content/toyota_Demo/configuration:/.helix/config.json",
+    "/content/toyota_Demo/headers:/.helix/headers.json",
+    "/content/toyota_Demo/metadata:/metadata.json",
+    "/content/toyota_Demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
   ],
   "includes": [
-    "/content/Toyota_Demo/"
+    "/content/toyota_Demo/"
   ]
 }
