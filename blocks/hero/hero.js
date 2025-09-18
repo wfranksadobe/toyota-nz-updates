@@ -1,3 +1,5 @@
+import { readBlockConfig } from '../../scripts/aem.js';
+
 export default function decorate(block) {
   const col = block.firstElementChild;
   const pic = col.querySelector('picture');
@@ -63,8 +65,14 @@ export default function decorate(block) {
     }
   }
 
-  // Handle direct button fields (for programmatic creation)
-  const buttonData = extractButtonData(col);
+  // Handle direct button fields from Universal Editor
+  const config = readBlockConfig(block);
+  const buttonData = {
+    text: config.buttonText || config.buttontext || '',
+    link: config.buttonLink || config.buttonlink || '',
+    type: config.buttonType || config.buttontype || 'primary'
+  };
+  
   if (buttonData.text && buttonData.link) {
     createHeroButton(col, buttonData);
   }
@@ -74,10 +82,10 @@ export default function decorate(block) {
  * Extract button data from data attributes or structured content
  * @param {Element} col - The hero column element
  * @returns {Object} Button data object
+ * @deprecated This function is no longer needed as we now use readBlockConfig
  */
 function extractButtonData(col) {
-  // This would typically come from the AEM authoring interface
-  // For now, we'll check for data attributes or specific structure
+  // Legacy fallback for data attributes
   return {
     text: col.dataset.buttonText || '',
     link: col.dataset.buttonLink || '',
