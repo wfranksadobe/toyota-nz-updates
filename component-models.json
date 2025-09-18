@@ -440,6 +440,56 @@
     ]
   },
   {
+    "id": "product-teaser",
+    "fields": [
+      {
+        "component": "text",
+        "name": "sku",
+        "label": "Product SKU",
+        "description": "The SKU of the product to display",
+        "required": true
+      },
+      {
+        "component": "select",
+        "name": "layout",
+        "label": "Layout Style",
+        "description": "Choose the teaser layout style",
+        "options": [
+          {
+            "name": "Card",
+            "value": "card"
+          },
+          {
+            "name": "Horizontal",
+            "value": "horizontal"
+          },
+          {
+            "name": "Minimal",
+            "value": "minimal"
+          }
+        ]
+      },
+      {
+        "component": "boolean",
+        "name": "showprice",
+        "label": "Show Price",
+        "description": "Display product price"
+      },
+      {
+        "component": "boolean",
+        "name": "showaddtocart",
+        "label": "Show Add to Cart",
+        "description": "Display add to cart button"
+      },
+      {
+        "component": "boolean",
+        "name": "showwishlist",
+        "label": "Show Wishlist",
+        "description": "Display wishlist toggle button"
+      }
+    ]
+  },
+  {
     "id": "page-metadata",
     "fields": [
       {
