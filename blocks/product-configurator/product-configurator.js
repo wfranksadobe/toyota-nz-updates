@@ -78,9 +78,42 @@ export default async function decorate(block) {
     block.innerHTML = `
       <div class="product-configurator__error">
         <p>Product SKU is required. Please configure it in the Universal Editor.</p>
+        <p><small>Enter a valid product SKU (e.g., "TOYOTA01") to load the product configurator.</small></p>
       </div>
     `;
     return;
+  }
+
+  // Add loading state
+  block.innerHTML = `
+    <div class="product-configurator__loading">
+      <p>Loading product ${sku}...</p>
+    </div>
+  `;
+
+  // Add Universal Editor support for live preview
+  if (window.hlx && window.hlx.live) {
+    // Listen for configuration changes in Universal Editor
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+          const newConfig = readBlockConfig(block);
+          if (newConfig.sku && newConfig.sku !== sku) {
+            // Clear existing content and re-render with new SKU
+            observer.disconnect(); // Prevent infinite loops
+            block.innerHTML = '';
+            decorate(block);
+            return;
+          }
+        }
+      });
+    });
+    
+    observer.observe(block, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
   }
 
   const labels = await fetchPlaceholders();
@@ -92,22 +125,35 @@ export default async function decorate(block) {
   // State to track if we are in update mode
   let isUpdateMode = false;
 
-  // Fetch product data using the configured SKU
+  // Fetch product data directly using the configured SKU
   let product = null;
   try {
+    // Fetch product data
     product = await pdpApi.fetchProductData(sku);
+    
     if (!product) {
       throw new Error(`Product with SKU ${sku} not found`);
     }
+    
+    // Manually trigger the PDP data event so dropins can use it
+    events.emit('pdp/data', product);
+    
+    // Also trigger product selection event for proper initialization
+    events.emit('pdp/product-selection', { sku: product.sku });
+    
   } catch (error) {
-    console.error('Error fetching product data:', error);
+    console.error('Error loading product data:', error);
     block.innerHTML = `
       <div class="product-configurator__error">
         <p>Error loading product: ${error.message}</p>
+        <p><small>Please check that the SKU "${sku}" is valid and available.</small></p>
       </div>
     `;
     return;
   }
+
+  // Clear loading state and prepare for product content
+  block.innerHTML = '';
 
   // Layout
   const fragment = document.createRange().createContextualFragment(`
