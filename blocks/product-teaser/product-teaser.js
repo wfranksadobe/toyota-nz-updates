@@ -1,6 +1,7 @@
 import { 
   Button, 
   Icon, 
+  InLineAlert,
   provider as UI 
 } from '@dropins/tools/components.js';
 import { h } from '@dropins/tools/preact.js';
@@ -177,22 +178,48 @@ function renderProductSku(element, product) {
 }
 
 function renderProductPrice(element, product) {
-  if (!product.prices || !product.prices.final) {
+  // Handle both possible data structures: prices (ProductModel) and price/priceRange (GraphQL)
+  let finalPrice, regularPrice;
+  
+  if (product.prices) {
+    // PDL ProductModel structure
+    finalPrice = product.prices.final;
+    regularPrice = product.prices.regular;
+  } else if (product.priceRange) {
+    // Complex product with price range
+    finalPrice = product.priceRange.minimum?.final;
+    regularPrice = product.priceRange.minimum?.regular;
+  } else if (product.price) {
+    // Simple product structure
+    finalPrice = product.price.final;
+    regularPrice = product.price.regular;
+  } else {
     element.remove();
     return;
   }
 
-  const finalPrice = product.prices.final;
-  const regularPrice = product.prices.regular;
+  if (!finalPrice) {
+    element.remove();
+    return;
+  }
   
   let priceHTML = '';
   
-  if (finalPrice.amount) {
-    priceHTML = formatPrice(finalPrice);
+  // Handle different price amount structures
+  const finalAmount = finalPrice.amount?.value || finalPrice.amount;
+  const finalCurrency = finalPrice.amount?.currency || finalPrice.currency;
+  
+  if (finalAmount) {
+    priceHTML = formatPriceValue(finalAmount, finalCurrency);
     
     // Show strikethrough for regular price if different from final price
-    if (regularPrice.amount && regularPrice.amount.value !== finalPrice.amount.value) {
-      priceHTML = `<span class="product-teaser__price--sale">${priceHTML}</span> <span class="product-teaser__price--regular">${formatPrice(regularPrice)}</span>`;
+    if (regularPrice) {
+      const regularAmount = regularPrice.amount?.value || regularPrice.amount;
+      const regularCurrency = regularPrice.amount?.currency || regularPrice.currency;
+      
+      if (regularAmount && regularAmount !== finalAmount) {
+        priceHTML = `<span class="product-teaser__price--sale">${priceHTML}</span> <span class="product-teaser__price--regular">${formatPriceValue(regularAmount, regularCurrency)}</span>`;
+      }
     }
   }
   
@@ -237,6 +264,11 @@ async function renderProductActions(container, product, config, labels) {
   // Clear existing content
   container.innerHTML = '';
   
+  // Add alert container for error messages
+  const alertContainer = document.createElement('div');
+  alertContainer.className = 'product-teaser__alert';
+  container.appendChild(alertContainer);
+  
   // Add to Cart Button
   if (showaddtocart && product.addToCartAllowed && product.inStock) {
     const addToCartContainer = document.createElement('div');
@@ -249,7 +281,7 @@ async function renderProductActions(container, product, config, labels) {
       variant: 'primary',
       size: 'small',
       onClick: async () => {
-        await handleAddToCart(addToCartBtn, product, labels);
+        await handleAddToCart(addToCartBtn, product, labels, alertContainer);
       }
     })(addToCartContainer);
   }
@@ -260,36 +292,58 @@ async function renderProductActions(container, product, config, labels) {
     wishlistContainer.className = 'product-teaser__wishlist';
     container.appendChild(wishlistContainer);
     
+    // Get the correct price for wishlist
+    let wishlistPrice;
+    if (product.prices) {
+      wishlistPrice = product.prices.final;
+    } else if (product.priceRange) {
+      wishlistPrice = product.priceRange.minimum?.final;
+    } else if (product.price) {
+      wishlistPrice = product.price.final;
+    }
+
     await wishlistRender.render(WishlistToggle, {
       product: {
         sku: product.sku,
         name: product.name,
         image: product.images?.[0]?.url,
-        price: product.prices?.final,
+        price: wishlistPrice,
         optionUIDs: product.optionUIDs
       }
     })(wishlistContainer);
   }
 }
 
-async function handleAddToCart(button, product, labels) {
+async function handleAddToCart(button, product, labels, alertContainer) {
+  const buttonActionText = labels.Global?.AddingToCart || 'Adding...';
+  let inlineAlert = null;
+  
   try {
     // Update button state
     button.setProps(prev => ({
       ...prev,
-      children: labels.Global?.AddingToCart || 'Adding...',
+      children: buttonActionText,
       disabled: true
     }));
 
-    // Add product to cart
+    // Build product configuration values like product-details does
+    // For simple products or when no options are configured
+    const values = {
+      sku: product.sku,
+      quantity: 1,
+      // Add any additional product configuration if available
+      ...(product.optionUIDs && { optionsUIDs: product.optionUIDs }),
+    };
+
+    // Add product to cart using the same API as product-details
     const { addProductsToCart } = await import(
       '@dropins/storefront-cart/api.js'
     );
     
-    await addProductsToCart([{
-      sku: product.sku,
-      quantity: 1
-    }]);
+    await addProductsToCart([values]);
+
+    // Reset any previous alerts if successful
+    inlineAlert?.remove();
 
     // Show success state briefly
     button.setProps(prev => ({
@@ -318,23 +372,31 @@ async function handleAddToCart(button, product, labels) {
   } catch (error) {
     console.error('Error adding to cart:', error);
     
-    // Show error state
+    // Add inline alert message exactly like product-details
+    inlineAlert = await UI.render(InLineAlert, {
+      heading: 'Error',
+      description: error.message,
+      icon: h(Icon, { source: 'Warning' }),
+      'aria-live': 'assertive',
+      role: 'alert',
+      onDismiss: () => {
+        inlineAlert.remove();
+      },
+    })(alertContainer);
+
+    // Scroll the alert into view
+    alertContainer.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  } finally {
+    // Reset button text and enable it
     button.setProps(prev => ({
       ...prev,
-      children: 'Error',
-      variant: 'error',
-      disabled: true
+      children: labels.Global?.AddProductToCart || 'Add to Cart',
+      variant: 'primary',
+      disabled: false
     }));
-    
-    // Reset button after 3 seconds
-    setTimeout(() => {
-      button.setProps(prev => ({
-        ...prev,
-        children: labels.Global?.AddProductToCart || 'Add to Cart',
-        variant: 'primary',
-        disabled: false
-      }));
-    }, 3000);
   }
 }
 
@@ -350,14 +412,21 @@ function navigateToProduct(product) {
   });
 }
 
-function formatPrice(price) {
-  if (!price || !price.amount) return '';
+function formatPriceValue(value, currency) {
+  if (!value) return '';
   
-  const { value, currency } = price.amount;
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency || 'USD'
   }).format(value);
+}
+
+// Keep the old function for backward compatibility
+function formatPrice(price) {
+  if (!price || !price.amount) return '';
+  
+  const { value, currency } = price.amount;
+  return formatPriceValue(value, currency);
 }
 
 function renderError(block, message) {
