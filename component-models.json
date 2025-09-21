@@ -438,7 +438,16 @@
   },
   {
     "id": "product-configurator",
-    "fields": []
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "sku",
+        "value": "",
+        "label": "Product SKU",
+        "description": "Enter the SKU of the product to configure"
+      }
+    ]
   },
   {
     "id": "product-details",

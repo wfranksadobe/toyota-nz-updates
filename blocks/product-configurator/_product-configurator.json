@@ -21,6 +21,14 @@
     {
       "id": "product-configurator",
       "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "sku",
+          "value": "",
+          "label": "Product SKU",
+          "description": "Enter the SKU of the product to configure"
+        }
       ]
     }
   ],

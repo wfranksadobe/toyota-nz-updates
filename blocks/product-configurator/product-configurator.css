@@ -71,6 +71,19 @@
   margin-top: var(--spacing-xsmall);
 }
 
+.product-configurator__error {
+  padding: var(--spacing-medium);
+  border: 1px solid var(--color-alert-500);
+  border-radius: var(--spacing-xsmall);
+  background-color: var(--color-alert-50);
+  color: var(--color-alert-700);
+}
+
+.product-configurator__error p {
+  margin: 0;
+  font-size: var(--type-body-2-font-size);
+}
+
 @media (min-width: 900px) {
   .product-configurator__wrapper {
     grid-template-columns: repeat(var(--grid-3-columns), 1fr);

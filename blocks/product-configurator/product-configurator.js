@@ -49,8 +49,40 @@ function updateAddToCartButtonText(addToCartInstance, inCart, labels) {
   }
 }
 
+function readBlockConfig(block) {
+  const config = {};
+  const rows = block.querySelectorAll(':scope > div');
+  
+  rows.forEach((row) => {
+    const cols = row.querySelectorAll(':scope > div');
+    if (cols.length >= 2) {
+      const key = cols[0].textContent.trim().toLowerCase();
+      const value = cols[1].textContent.trim();
+      
+      // Convert boolean strings
+      if (value === 'true') config[key] = true;
+      else if (value === 'false') config[key] = false;
+      else config[key] = value;
+    }
+  });
+  
+  return config;
+}
+
 export default async function decorate(block) {
-  const product = events.lastPayload('pdp/data') ?? null;
+  // Get configuration from block authoring
+  const config = readBlockConfig(block);
+  const { sku } = config;
+
+  if (!sku) {
+    block.innerHTML = `
+      <div class="product-configurator__error">
+        <p>Product SKU is required. Please configure it in the Universal Editor.</p>
+      </div>
+    `;
+    return;
+  }
+
   const labels = await fetchPlaceholders();
 
   // Read itemUid from URL
@@ -59,6 +91,23 @@ export default async function decorate(block) {
 
   // State to track if we are in update mode
   let isUpdateMode = false;
+
+  // Fetch product data using the configured SKU
+  let product = null;
+  try {
+    product = await pdpApi.fetchProductData(sku);
+    if (!product) {
+      throw new Error(`Product with SKU ${sku} not found`);
+    }
+  } catch (error) {
+    console.error('Error fetching product data:', error);
+    block.innerHTML = `
+      <div class="product-configurator__error">
+        <p>Error loading product: ${error.message}</p>
+      </div>
+    `;
+    return;
+  }
 
   // Layout
   const fragment = document.createRange().createContextualFragment(`
