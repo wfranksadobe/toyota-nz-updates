@@ -94,7 +94,9 @@
         {"...": "./_common-blocks.json"},
         "product-teaser",
         "product-configurator",
-        "product-recommendations"
+        "product-recommendations",
+        "form",
+        "embed-adaptive-form"
       ]
     },
     {
