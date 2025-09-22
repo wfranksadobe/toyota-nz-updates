@@ -107,9 +107,6 @@ async function renderProductTeaser(block, product, config, labels) {
   // Render short description
   renderShortDescription(shortDescElement, product);
 
-  // Render stock status
-  renderStockStatus(block, product);
-
   // Render actions (Add to Cart and Wishlist)
   if (actionsContainer && (showaddtocart || showwishlist)) {
     await renderProductActions(actionsContainer, product, config, labels);
@@ -236,27 +233,6 @@ function renderShortDescription(element, product) {
   element.classList.remove('loading-placeholder');
 }
 
-function renderStockStatus(block, product) {
-  const stockStatusElement = document.createElement('div');
-  stockStatusElement.className = 'product-teaser__stock-status';
-  
-  if (product.inStock) {
-    stockStatusElement.classList.add('product-teaser__stock-status--in-stock');
-    stockStatusElement.textContent = 'In Stock';
-  } else {
-    stockStatusElement.classList.add('product-teaser__stock-status--out-of-stock');
-    stockStatusElement.textContent = 'Out of Stock';
-  }
-  
-  const contentElement = block.querySelector('.product-teaser__content');
-  const actionsElement = block.querySelector('.product-teaser__actions');
-  
-  if (actionsElement) {
-    contentElement.insertBefore(stockStatusElement, actionsElement);
-  } else {
-    contentElement.appendChild(stockStatusElement);
-  }
-}
 
 async function renderProductActions(container, product, config, labels) {
   const { showaddtocart, showwishlist } = config;
