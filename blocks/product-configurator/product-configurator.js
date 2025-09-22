@@ -10,6 +10,8 @@ import { tryRenderAemAssetsImage } from '@dropins/tools/lib/aem/assets.js';
 import * as pdpApi from '@dropins/storefront-pdp/api.js';
 import { render as pdpRendered } from '@dropins/storefront-pdp/render.js';
 import { render as wishlistRender } from '@dropins/storefront-wishlist/render.js';
+import { getHeaders } from '@dropins/tools/lib/aem/configs.js';
+import { initializers } from '@dropins/tools/initializer.js';
 
 import { WishlistToggle } from '@dropins/storefront-wishlist/containers/WishlistToggle.js';
 import { WishlistAlert } from '@dropins/storefront-wishlist/containers/WishlistAlert.js';
@@ -29,12 +31,18 @@ import {
   rootLink,
   setJsonLd,
   fetchPlaceholders,
+  commerceEndpointWithQueryParams,
 } from '../../scripts/commerce.js';
 
-// Initializers
-import { IMAGES_SIZES } from '../../scripts/initializers/pdp.js';
+// Initializers - Import only cart and wishlist, not PDP (we handle PDP manually)
 import '../../scripts/initializers/cart.js';
 import '../../scripts/initializers/wishlist.js';
+
+// Import PDP configs directly
+export const IMAGES_SIZES = {
+  width: 960,
+  height: 1191,
+};
 
 // Function to update the Add to Cart button text
 function updateAddToCartButtonText(addToCartInstance, inCart, labels) {
@@ -70,389 +78,365 @@ function readBlockConfig(block) {
 }
 
 export default async function decorate(block) {
+  // PRODUCT CONFIGURATOR - Exact copy of product-details with SKU from Universal Editor
+  
   // Get configuration from block authoring
   const config = readBlockConfig(block);
   const { sku } = config;
+
+  // Clear the original configuration divs from Universal Editor
+  block.innerHTML = '';
 
   if (!sku) {
     block.innerHTML = `
       <div class="product-configurator__error">
         <p>Product SKU is required. Please configure it in the Universal Editor.</p>
-        <p><small>Enter a valid product SKU (e.g., "TOYOTA01") to load the product configurator.</small></p>
+        <p><small>Enter a valid product SKU to load the product configurator.</small></p>
       </div>
     `;
-    return;
+    return Promise.resolve();
   }
 
-  // Add loading state
-  block.innerHTML = `
-    <div class="product-configurator__loading">
-      <p>Loading product ${sku}...</p>
-    </div>
-  `;
-
-  // Add Universal Editor support for live preview
-  if (window.hlx && window.hlx.live) {
-    // Listen for configuration changes in Universal Editor
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList' || mutation.type === 'characterData') {
-          const newConfig = readBlockConfig(block);
-          if (newConfig.sku && newConfig.sku !== sku) {
-            // Clear existing content and re-render with new SKU
-            observer.disconnect(); // Prevent infinite loops
-            block.innerHTML = '';
-            decorate(block);
-            return;
-          }
-        }
-      });
-    });
-    
-    observer.observe(block, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
-  }
-
-  const labels = await fetchPlaceholders();
-
-  // Read itemUid from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const itemUidFromUrl = urlParams.get('itemUid');
-
-  // State to track if we are in update mode
-  let isUpdateMode = false;
-
-  // Fetch product data directly using the configured SKU
-  let product = null;
   try {
-    // Fetch product data
-    product = await pdpApi.fetchProductData(sku);
+    // Initialize PDP API manually (without URL dependency)
+    await initializePDPForConfigurator();
+    
+    // Fetch product data using the configured SKU
+    const product = await pdpApi.fetchProductData(sku);
     
     if (!product) {
       throw new Error(`Product with SKU ${sku} not found`);
     }
-    
-    // Manually trigger the PDP data event so dropins can use it
+
+    // Initialize dropins with our specific product data
+    await initializePDPDropins(sku, product);
+
+    // Set product data in global state for dropins components
     events.emit('pdp/data', product);
-    
-    // Also trigger product selection event for proper initialization
     events.emit('pdp/product-selection', { sku: product.sku });
+
+    // Continue with exact same logic as product-details
+    const labels = await fetchPlaceholders();
+
+    // Read itemUid from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemUidFromUrl = urlParams.get('itemUid');
+
+    // State to track if we are in update mode
+    let isUpdateMode = false;
+
+    // Layout - same as product-details but with product-configurator classes
+    const fragment = document.createRange().createContextualFragment(`
+      <div class="product-configurator__alert"></div>
+      <div class="product-configurator__wrapper">
+        <div class="product-configurator__left-column">
+          <div class="product-configurator__gallery"></div>
+        </div>
+        <div class="product-configurator__right-column">
+          <div class="product-configurator__header"></div>
+          <div class="product-configurator__price"></div>
+          <div class="product-configurator__gallery"></div>
+          <div class="product-configurator__short-description"></div>
+          <div class="product-configurator__configuration">
+            <div class="product-configurator__options"></div>
+            <div class="product-configurator__quantity"></div>
+            <div class="product-configurator__buttons">
+              <div class="product-configurator__buttons__add-to-cart"></div>
+              <div class="product-configurator__buttons__add-to-wishlist"></div>
+            </div>
+          </div>
+          <div class="product-configurator__description"></div>
+          <div class="product-configurator__attributes"></div>
+        </div>
+      </div>
+    `);
+
+    const $alert = fragment.querySelector('.product-configurator__alert');
+    const $gallery = fragment.querySelector('.product-configurator__gallery');
+    const $header = fragment.querySelector('.product-configurator__header');
+    const $price = fragment.querySelector('.product-configurator__price');
+    const $galleryMobile = fragment.querySelector('.product-configurator__right-column .product-configurator__gallery');
+    const $shortDescription = fragment.querySelector('.product-configurator__short-description');
+    const $options = fragment.querySelector('.product-configurator__options');
+    const $quantity = fragment.querySelector('.product-configurator__quantity');
+    const $addToCart = fragment.querySelector('.product-configurator__buttons__add-to-cart');
+    const $wishlistToggleBtn = fragment.querySelector('.product-configurator__buttons__add-to-wishlist');
+    const $description = fragment.querySelector('.product-configurator__description');
+    const $attributes = fragment.querySelector('.product-configurator__attributes');
+
+    block.appendChild(fragment);
+
+    const gallerySlots = {
+      CarouselThumbnail: (ctx) => {
+        tryRenderAemAssetsImage(ctx, {
+          ...imageSlotConfig(ctx),
+          wrapper: document.createElement('span'),
+        });
+      },
+
+      CarouselMainImage: (ctx) => {
+        tryRenderAemAssetsImage(ctx, {
+          ...imageSlotConfig(ctx),
+        });
+      },
+    };
+
+    // Alert
+    let inlineAlert = null;
+    const routeToWishlist = '/wishlist';
+
+    const [
+      _galleryMobile,
+      _gallery,
+      _header,
+      _price,
+      _shortDescription,
+      _options,
+      _quantity,
+      _description,
+      _attributes,
+      wishlistToggleBtn,
+    ] = await Promise.all([
+      // Gallery (Mobile)
+      pdpRendered.render(ProductGallery, {
+        controls: 'dots',
+        arrows: true,
+        peak: false,
+        gap: 'small',
+        loop: false,
+        imageParams: {
+          ...IMAGES_SIZES,
+        },
+
+        slots: gallerySlots,
+      })($galleryMobile),
+
+      // Gallery (Desktop)
+      pdpRendered.render(ProductGallery, {
+        controls: 'thumbnailsColumn',
+        arrows: true,
+        peak: true,
+        gap: 'small',
+        loop: false,
+        imageParams: {
+          ...IMAGES_SIZES,
+        },
+
+        slots: gallerySlots,
+      })($gallery),
+
+      // Header
+      pdpRendered.render(ProductHeader, {})($header),
+
+      // Price
+      pdpRendered.render(ProductPrice, {})($price),
+
+      // Short Description
+      pdpRendered.render(ProductShortDescription, {})($shortDescription),
+
+      // Configuration - Swatches
+      pdpRendered.render(ProductOptions, {
+        hideSelectedValue: false,
+        slots: {
+          SwatchImage: (ctx) => {
+            tryRenderAemAssetsImage(ctx, {
+              ...imageSlotConfig(ctx),
+              wrapper: document.createElement('span'),
+            });
+          },
+        },
+      })($options),
+
+      // Configuration  Quantity
+      pdpRendered.render(ProductQuantity, {})($quantity),
+
+      // Description
+      pdpRendered.render(ProductDescription, {})($description),
+
+      // Attributes
+      pdpRendered.render(ProductAttributes, {})($attributes),
+
+      // Wishlist button - WishlistToggle Container
+      wishlistRender.render(WishlistToggle, {
+        product,
+      })($wishlistToggleBtn),
+    ]);
+
+    // Configuration – Button - Add to Cart
+    const addToCart = await UI.render(Button, {
+      children: labels.Global?.AddProductToCart,
+      icon: h(Icon, { source: 'Cart' }),
+      onClick: async () => {
+        const buttonActionText = isUpdateMode
+          ? labels.Global?.UpdatingInCart
+          : labels.Global?.AddingToCart;
+        try {
+          addToCart.setProps((prev) => ({
+            ...prev,
+            children: buttonActionText,
+            disabled: true,
+          }));
+
+          // get the current selection values
+          const values = pdpApi.getProductConfigurationValues();
+          const valid = pdpApi.isProductConfigurationValid();
+
+          // add or update the product in the cart
+          if (valid) {
+            if (isUpdateMode) {
+              // --- Update existing item ---
+              const { updateProductsFromCart } = await import(
+                '@dropins/storefront-cart/api.js'
+              );
+
+              await updateProductsFromCart([{ ...values, uid: itemUidFromUrl }]);
+
+              // --- START REDIRECT ON UPDATE ---
+              const updatedSku = values?.sku;
+              if (updatedSku) {
+                const cartRedirectUrl = new URL(
+                  rootLink('/cart'),
+                  window.location.origin,
+                );
+                cartRedirectUrl.searchParams.set('itemUid', itemUidFromUrl);
+                window.location.href = cartRedirectUrl.toString();
+              } else {
+                // Fallback if SKU is somehow missing (shouldn't happen in normal flow)
+                console.warn(
+                  'Could not retrieve SKU for updated item. Redirecting to cart without parameter.',
+                );
+                window.location.href = rootLink('/cart');
+              }
+              return;
+            }
+            // --- Add new item ---
+            const { addProductsToCart } = await import(
+              '@dropins/storefront-cart/api.js'
+            );
+            await addProductsToCart([{ ...values }]);
+          }
+
+          // reset any previous alerts if successful
+          inlineAlert?.remove();
+        } catch (error) {
+          // add alert message
+          inlineAlert = await UI.render(InLineAlert, {
+            heading: 'Error',
+            description: error.message,
+            icon: h(Icon, { source: 'Warning' }),
+            'aria-live': 'assertive',
+            role: 'alert',
+            onDismiss: () => {
+              inlineAlert.remove();
+            },
+          })($alert);
+
+          // Scroll the alertWrapper into view
+          $alert.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        } finally {
+          // Reset button text using the helper function which respects the current mode
+          updateAddToCartButtonText(addToCart, isUpdateMode, labels);
+          // Re-enable button
+          addToCart.setProps((prev) => ({
+            ...prev,
+            disabled: false,
+          }));
+        }
+      },
+    })($addToCart);
+
+    // Lifecycle Events
+    events.on('pdp/valid', (valid) => {
+      // update add to cart button disabled state based on product selection validity
+      addToCart.setProps((prev) => ({ ...prev, disabled: !valid }));
+    }, { eager: true });
+
+    // Handle option changes
+    events.on('pdp/values', () => {
+      if (wishlistToggleBtn) {
+        const configValues = pdpApi.getProductConfigurationValues();
+
+        // Check URL parameter for empty optionsUIDs
+        const urlOptionsUIDs = urlParams.get('optionsUIDs');
+
+        // If URL has empty optionsUIDs parameter, treat as base product (no options)
+        const optionUIDs = urlOptionsUIDs === '' ? undefined : (configValues?.optionsUIDs || undefined);
+
+        wishlistToggleBtn.setProps((prev) => ({
+          ...prev,
+          product: {
+            ...product,
+            optionUIDs,
+          },
+        }));
+      }
+    }, { eager: true });
+
+    events.on('wishlist/alert', ({ action, item }) => {
+      wishlistRender.render(WishlistAlert, {
+        action,
+        item,
+        routeToWishlist,
+      })($alert);
+
+      setTimeout(() => {
+        $alert.innerHTML = '';
+      }, 5000);
+
+      setTimeout(() => {
+        $alert.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 0);
+    });
+
+    // --- Add new event listener for cart/data ---
+    events.on(
+      'cart/data',
+      (cartData) => {
+        let itemIsInCart = false;
+        if (itemUidFromUrl && cartData?.items) {
+          itemIsInCart = cartData.items.some(
+            (item) => item.uid === itemUidFromUrl,
+          );
+        }
+        // Set the update mode state
+        isUpdateMode = itemIsInCart;
+
+        // Update button text based on whether the item is in the cart
+        updateAddToCartButtonText(addToCart, itemIsInCart, labels);
+      },
+      { eager: true },
+    );
+
+    // Set JSON-LD and Meta Tags - only if no product-details component exists
+    events.on('aem/lcp', () => {
+      if (product) {
+        const productDetailsExists = document.querySelector('.product-details');
+        if (!productDetailsExists) {
+          setJsonLdProduct(product);
+          setMetaTags(product);
+          document.title = product.name;
+        }
+      }
+    }, { eager: true });
+
+    return Promise.resolve();
     
   } catch (error) {
-    console.error('Error loading product data:', error);
+    console.error('Error loading product configurator:', error);
     block.innerHTML = `
       <div class="product-configurator__error">
         <p>Error loading product: ${error.message}</p>
         <p><small>Please check that the SKU "${sku}" is valid and available.</small></p>
       </div>
     `;
-    return;
+    return Promise.resolve();
   }
-
-  // Clear loading state and prepare for product content
-  block.innerHTML = '';
-
-  // Layout
-  const fragment = document.createRange().createContextualFragment(`
-    <div class="product-configurator__alert"></div>
-    <div class="product-configurator__wrapper">
-      <div class="product-configurator__left-column">
-        <div class="product-configurator__gallery"></div>
-      </div>
-      <div class="product-configurator__right-column">
-        <div class="product-configurator__header"></div>
-        <div class="product-configurator__price"></div>
-        <div class="product-configurator__gallery"></div>
-        <div class="product-configurator__short-description"></div>
-        <div class="product-configurator__configuration">
-          <div class="product-configurator__options"></div>
-          <div class="product-configurator__quantity"></div>
-          <div class="product-configurator__buttons">
-            <div class="product-configurator__buttons__add-to-cart"></div>
-            <div class="product-configurator__buttons__add-to-wishlist"></div>
-          </div>
-        </div>
-        <div class="product-configurator__description"></div>
-        <div class="product-configurator__attributes"></div>
-      </div>
-    </div>
-  `);
-
-  const $alert = fragment.querySelector('.product-configurator__alert');
-  const $gallery = fragment.querySelector('.product-configurator__gallery');
-  const $header = fragment.querySelector('.product-configurator__header');
-  const $price = fragment.querySelector('.product-configurator__price');
-  const $galleryMobile = fragment.querySelector('.product-configurator__right-column .product-configurator__gallery');
-  const $shortDescription = fragment.querySelector('.product-configurator__short-description');
-  const $options = fragment.querySelector('.product-configurator__options');
-  const $quantity = fragment.querySelector('.product-configurator__quantity');
-  const $addToCart = fragment.querySelector('.product-configurator__buttons__add-to-cart');
-  const $wishlistToggleBtn = fragment.querySelector('.product-configurator__buttons__add-to-wishlist');
-  const $description = fragment.querySelector('.product-configurator__description');
-  const $attributes = fragment.querySelector('.product-configurator__attributes');
-
-  block.appendChild(fragment);
-
-  const gallerySlots = {
-    CarouselThumbnail: (ctx) => {
-      tryRenderAemAssetsImage(ctx, {
-        ...imageSlotConfig(ctx),
-        wrapper: document.createElement('span'),
-      });
-    },
-
-    CarouselMainImage: (ctx) => {
-      tryRenderAemAssetsImage(ctx, {
-        ...imageSlotConfig(ctx),
-      });
-    },
-  };
-
-  // Alert
-  let inlineAlert = null;
-  const routeToWishlist = '/wishlist';
-
-  const [
-    _galleryMobile,
-    _gallery,
-    _header,
-    _price,
-    _shortDescription,
-    _options,
-    _quantity,
-    _description,
-    _attributes,
-    wishlistToggleBtn,
-  ] = await Promise.all([
-    // Gallery (Mobile)
-    pdpRendered.render(ProductGallery, {
-      controls: 'dots',
-      arrows: true,
-      peak: false,
-      gap: 'small',
-      loop: false,
-      imageParams: {
-        ...IMAGES_SIZES,
-      },
-
-      slots: gallerySlots,
-    })($galleryMobile),
-
-    // Gallery (Desktop)
-    pdpRendered.render(ProductGallery, {
-      controls: 'thumbnailsColumn',
-      arrows: true,
-      peak: true,
-      gap: 'small',
-      loop: false,
-      imageParams: {
-        ...IMAGES_SIZES,
-      },
-
-      slots: gallerySlots,
-    })($gallery),
-
-    // Header
-    pdpRendered.render(ProductHeader, {})($header),
-
-    // Price
-    pdpRendered.render(ProductPrice, {})($price),
-
-    // Short Description
-    pdpRendered.render(ProductShortDescription, {})($shortDescription),
-
-    // Configuration - Swatches
-    pdpRendered.render(ProductOptions, {
-      hideSelectedValue: false,
-      slots: {
-        SwatchImage: (ctx) => {
-          tryRenderAemAssetsImage(ctx, {
-            ...imageSlotConfig(ctx),
-            wrapper: document.createElement('span'),
-          });
-        },
-      },
-    })($options),
-
-    // Configuration  Quantity
-    pdpRendered.render(ProductQuantity, {})($quantity),
-
-    // Description
-    pdpRendered.render(ProductDescription, {})($description),
-
-    // Attributes
-    pdpRendered.render(ProductAttributes, {})($attributes),
-
-    // Wishlist button - WishlistToggle Container
-    wishlistRender.render(WishlistToggle, {
-      product,
-    })($wishlistToggleBtn),
-  ]);
-
-  // Configuration – Button - Add to Cart
-  const addToCart = await UI.render(Button, {
-    children: labels.Global?.AddProductToCart,
-    icon: h(Icon, { source: 'Cart' }),
-    onClick: async () => {
-      const buttonActionText = isUpdateMode
-        ? labels.Global?.UpdatingInCart
-        : labels.Global?.AddingToCart;
-      try {
-        addToCart.setProps((prev) => ({
-          ...prev,
-          children: buttonActionText,
-          disabled: true,
-        }));
-
-        // get the current selection values
-        const values = pdpApi.getProductConfigurationValues();
-        const valid = pdpApi.isProductConfigurationValid();
-
-        // add or update the product in the cart
-        if (valid) {
-          if (isUpdateMode) {
-            // --- Update existing item ---
-            const { updateProductsFromCart } = await import(
-              '@dropins/storefront-cart/api.js'
-            );
-
-            await updateProductsFromCart([{ ...values, uid: itemUidFromUrl }]);
-
-            // --- START REDIRECT ON UPDATE ---
-            const updatedSku = values?.sku;
-            if (updatedSku) {
-              const cartRedirectUrl = new URL(
-                rootLink('/cart'),
-                window.location.origin,
-              );
-              cartRedirectUrl.searchParams.set('itemUid', itemUidFromUrl);
-              window.location.href = cartRedirectUrl.toString();
-            } else {
-              // Fallback if SKU is somehow missing (shouldn't happen in normal flow)
-              console.warn(
-                'Could not retrieve SKU for updated item. Redirecting to cart without parameter.',
-              );
-              window.location.href = rootLink('/cart');
-            }
-            return;
-          }
-          // --- Add new item ---
-          const { addProductsToCart } = await import(
-            '@dropins/storefront-cart/api.js'
-          );
-          await addProductsToCart([{ ...values }]);
-        }
-
-        // reset any previous alerts if successful
-        inlineAlert?.remove();
-      } catch (error) {
-        // add alert message
-        inlineAlert = await UI.render(InLineAlert, {
-          heading: 'Error',
-          description: error.message,
-          icon: h(Icon, { source: 'Warning' }),
-          'aria-live': 'assertive',
-          role: 'alert',
-          onDismiss: () => {
-            inlineAlert.remove();
-          },
-        })($alert);
-
-        // Scroll the alertWrapper into view
-        $alert.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      } finally {
-        // Reset button text using the helper function which respects the current mode
-        updateAddToCartButtonText(addToCart, isUpdateMode, labels);
-        // Re-enable button
-        addToCart.setProps((prev) => ({
-          ...prev,
-          disabled: false,
-        }));
-      }
-    },
-  })($addToCart);
-
-  // Lifecycle Events
-  events.on('pdp/valid', (valid) => {
-    // update add to cart button disabled state based on product selection validity
-    addToCart.setProps((prev) => ({ ...prev, disabled: !valid }));
-  }, { eager: true });
-
-  // Handle option changes
-  events.on('pdp/values', () => {
-    if (wishlistToggleBtn) {
-      const configValues = pdpApi.getProductConfigurationValues();
-
-      // Check URL parameter for empty optionsUIDs
-      const urlOptionsUIDs = urlParams.get('optionsUIDs');
-
-      // If URL has empty optionsUIDs parameter, treat as base product (no options)
-      const optionUIDs = urlOptionsUIDs === '' ? undefined : (configValues?.optionsUIDs || undefined);
-
-      wishlistToggleBtn.setProps((prev) => ({
-        ...prev,
-        product: {
-          ...product,
-          optionUIDs,
-        },
-      }));
-    }
-  }, { eager: true });
-
-  events.on('wishlist/alert', ({ action, item }) => {
-    wishlistRender.render(WishlistAlert, {
-      action,
-      item,
-      routeToWishlist,
-    })($alert);
-
-    setTimeout(() => {
-      $alert.innerHTML = '';
-    }, 5000);
-
-    setTimeout(() => {
-      $alert.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }, 0);
-  });
-
-  // --- Add new event listener for cart/data ---
-  events.on(
-    'cart/data',
-    (cartData) => {
-      let itemIsInCart = false;
-      if (itemUidFromUrl && cartData?.items) {
-        itemIsInCart = cartData.items.some(
-          (item) => item.uid === itemUidFromUrl,
-        );
-      }
-      // Set the update mode state
-      isUpdateMode = itemIsInCart;
-
-      // Update button text based on whether the item is in the cart
-      updateAddToCartButtonText(addToCart, itemIsInCart, labels);
-    },
-    { eager: true },
-  );
-
-  // Set JSON-LD and Meta Tags
-  events.on('aem/lcp', () => {
-    if (product) {
-      setJsonLdProduct(product);
-      setMetaTags(product);
-      document.title = product.name;
-    }
-  }, { eager: true });
-
-  return Promise.resolve();
 }
 
 async function setJsonLdProduct(product) {
@@ -581,6 +565,53 @@ function setMetaTags(product) {
   createMetaTag('og:image:secure_url', metaImage, 'property');
   createMetaTag('product:price:amount', price.value, 'property');
   createMetaTag('product:price:currency', price.currency, 'property');
+}
+
+/**
+ * Initialize PDP API without URL dependency
+ */
+async function initializePDPForConfigurator() {
+  try {
+    // Set Fetch Endpoint (Service) - only if not already set
+    const currentEndpoint = pdpApi.getEndpoint?.();
+    if (!currentEndpoint) {
+      pdpApi.setEndpoint(await commerceEndpointWithQueryParams());
+    }
+
+    // Set Fetch Headers (Service)
+    pdpApi.setFetchGraphQlHeaders((prev) => ({ ...prev, ...getHeaders('cs') }));
+  } catch (error) {
+    console.warn('PDP API already initialized, skipping configurator initialization');
+  }
+}
+
+/**
+ * Initialize PDP Dropins with specific product data
+ */
+async function initializePDPDropins(sku, product) {
+  const labels = await fetchPlaceholders('placeholders/pdp.json');
+
+  const langDefinitions = {
+    default: {
+      ...labels,
+    },
+  };
+
+  const models = {
+    ProductDetails: {
+      initialData: { ...product },
+    },
+  };
+
+  // Initialize Dropins with our specific product data
+  return initializers.mountImmediately(pdpApi.initialize, {
+    sku,
+    optionsUIDs: [], // No URL-based options for configurator
+    langDefinitions,
+    models,
+    acdl: true,
+    persistURLParams: false, // Don't persist URL params for configurator
+  });
 }
 
 /**
