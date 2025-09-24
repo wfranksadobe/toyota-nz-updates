@@ -87,7 +87,9 @@ async function applyChanges(event) {
     if (block) {
       const blockResource = block.getAttribute('data-aue-resource');
       const newBlock = parsedUpdate.querySelector(`[data-aue-resource="${blockResource}"]`);
-      if (newBlock) {
+      if (block.dataset.aueModel === 'form') {
+        return true;
+      } else if (newBlock) {
         newBlock.style.display = 'none';
         block.insertAdjacentElement('afterend', newBlock);
         decorateButtons(newBlock);
@@ -146,6 +148,8 @@ function attachEventListners(main) {
     } else {
       window.location.reload();
     }
+    const module = await import('./form-editor-support.js');
+      module.attachEventListners(main);
   }));
 }
 
