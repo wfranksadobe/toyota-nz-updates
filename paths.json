@@ -5,10 +5,11 @@
     "/content/toyota_demo/headers:/.helix/headers.json",
     "/content/toyota_demo/metadata:/metadata.json",
     "/content/toyota_demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json",
-    "/content/form/af/toyota-form/:/form/"  
+    "/content/forms/af/:/forms/af/",
+    "/adobe/forms/af/:/adobe/forms/af/"
   ],
   "includes": [
     "/content/toyota_demo/",
-    "/content/form/af/toyota-form/"   
+    "/content/forms/af/"
   ]
 }
