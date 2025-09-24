@@ -9,6 +9,7 @@
   ],
   "includes": [
     "/content/toyota_demo/",
-    "/content/forms/"
+    "/content/forms/",
+    "/adobe/forms/"
   ]
 }
