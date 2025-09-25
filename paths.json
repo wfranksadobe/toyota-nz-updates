@@ -1,5 +1,6 @@
 {
   "mappings": [
+    "/:/",
     "/content/toyota_demo/:/",
     "/content/toyota_demo/configuration:/.helix/config.json",
     "/content/toyota_demo/headers:/.helix/headers.json",
@@ -7,6 +8,9 @@
     "/content/toyota_demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
   ],
   "includes": [
-    "/content/toyota_demo/"
+    "/content/toyota_demo/",
+    "/content/forms/af/",
+    "/content/dam/",
+    "/adobe/forms/af/"
   ]
 }
