@@ -1,7 +1,6 @@
 {
   "mappings": [
     "/:/",
-    "/content/forms/af/toyota-form:/content/forms/af/toyota-form",
     "/content/toyota_demo/:/",
     "/content/toyota_demo/configuration:/.helix/config.json",
     "/content/toyota_demo/headers:/.helix/headers.json",
@@ -10,8 +9,8 @@
   ],
   "includes": [
     "/content/toyota_demo/",
-    "/content/forms/",
+    "/content/forms/af/",
     "/content/dam/",
-    "/adobe/forms/"
+    "/adobe/forms/af/"
   ]
 }
