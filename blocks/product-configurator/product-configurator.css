@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(var(--grid-1-columns), 1fr);
   grid-column-gap: var(--grid-1-gutters);
-  margin-top: var(--spacing-medium);
+  /* margin-top: var(--spacing-medium); */
   /* background: linear-gradient(180deg,#ededed 0,#d5d5d5); */
 }
 .product-configurator__header.dropin-design .pdp-header .pdp-header__sku {
@@ -14,13 +14,11 @@
 .pdp-swatches__options{
   gap: var(--spacing-small);
 }
-.product-configurator__left-column {
-  display: none;
-}
 
 .product-configurator__right-column {
   grid-column: 1 / span 4;
   color: var(--color-neutral-800);
+  /* background-color: blue; */
 }
 
 .product-configurator__alert {
@@ -41,17 +39,89 @@
 }
 
 .product-configurator__gallery .pdp-carousel {
-  max-height: 60vh;
+  max-height: 95vh;
+  min-height: 95vh;
 }
 
 .product-configurator__gallery .pdp-carousel--thumbnailsRow {
-  max-height: 80vh;
+  max-height: 98vh;
+  min-height: 98vh;
 }
 
 .product-configurator__gallery .pdp-overlay__content .pdp-carousel,
 .product-configurator__gallery .pdp-overlay__content .pdp-carousel--thumbnailsRow
 {
   max-height: unset;;
+}
+
+/* Increase actual image sizes */
+.product-configurator__gallery img {
+  max-width: 100% !important;
+  max-height: 110vh !important;
+  min-height: 90vh !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  transform: scale(1.4) !important;
+  margin-top: 0 !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Increase carousel container sizes */
+.product-configurator__gallery .pdp-carousel__main,
+.product-configurator__gallery .pdp-carousel__slides,
+.product-configurator__gallery .pdp-carousel__slide {
+  height: 95vh !important;
+  max-height: 95vh !important;
+  min-height: 95vh !important;
+}
+
+/* Increase thumbnail view container sizes */
+.product-configurator__gallery .pdp-carousel--thumbnailsRow .pdp-carousel__main,
+.product-configurator__gallery .pdp-carousel--thumbnailsRow .pdp-carousel__slides,
+.product-configurator__gallery .pdp-carousel--thumbnailsRow .pdp-carousel__slide {
+  height: 98vh !important;
+  max-height: 98vh !important;
+  min-height: 98vh !important;
+}
+
+/* Force gallery to take full column height */
+.product-configurator__left-column .product-configurator__gallery {
+  height: 120vh !important;
+  overflow: visible;
+  margin-top: 0 !important;
+  padding: var(--spacing-medium) 0;
+}
+
+/* Scale up the entire gallery container */
+.product-configurator__gallery {
+  transform: scale(1.3) !important;
+  transform-origin: center center !important;
+  margin-top: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Disable clicks on all gallery interactive elements */
+.product-configurator__gallery button,
+.product-configurator__gallery a,
+.product-configurator__gallery [role="button"],
+.product-configurator__gallery .pdp-carousel__nav,
+.product-configurator__gallery .pdp-carousel__button,
+.product-configurator__gallery .pdp-carousel__thumbnail,
+.product-configurator__gallery .pdp-carousel__slide {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+/* Disable gallery overlay and zoom functionality */
+.product-configurator__gallery .pdp-overlay,
+.product-configurator__gallery .pdp-overlay__trigger {
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
 
@@ -128,26 +198,46 @@
 
 @media (min-width: 900px) {
   .product-configurator__wrapper {
-    grid-template-columns: repeat(var(--grid-3-columns), 1fr);
-    grid-column-gap: var(--grid-3-gutters);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 120vh;
+    gap: var(--spacing-xxbig);
     position: relative;
+    min-height: 120vh;
+    overflow: visible;
+    padding: var(--spacing-big) 0;
   }
 
   .product-configurator__alert {
-    grid-column: 1 / span 12;
     margin-bottom: var(--spacing-medium);
   }
 
+  /* Put right-column (with product details) at first row, first column */
   .product-configurator__right-column {
+    /* background-color: blue; */
+    grid-column: 1;
+    grid-row: 1;
     display: block;
-    grid-column: 1 / span 6;
+    min-height: 120vh;
+    overflow: visible;
   }
   
+  /* Put left-column (with gallery) at first row, second column */
   .product-configurator__left-column {
-    grid-column: 7 / span 5;
-    padding-top: var(--spacing-medium);
+    /* background-color: red; */
+    grid-column: 2;
+    grid-row: 1;
+    display: block;
+    min-height: 120vh;
+    overflow: visible;
   }
 
+  /* Show the left-column gallery (it should be visible on right side) */
+  .product-configurator__left-column .product-configurator__gallery {
+    display: block;
+  }
+  
+  /* Hide the right-column mobile gallery since we want desktop gallery */
   .product-configurator__right-column .product-configurator__gallery {
     display: none;
   }

@@ -40,8 +40,8 @@ import '../../scripts/initializers/wishlist.js';
 
 // Import PDP configs directly
 export const IMAGES_SIZES = {
-  width: 960,
-  height: 1191,
+  width: 2560,
+  height: 3200,
 };
 
 // Function to update the Add to Cart button text
