@@ -39,13 +39,13 @@
 }
 
 .product-configurator__gallery .pdp-carousel {
-  max-height: 95vh;
-  min-height: 95vh;
+  max-height: 70vh;
+  min-height: 70vh;
 }
 
 .product-configurator__gallery .pdp-carousel--thumbnailsRow {
-  max-height: 98vh;
-  min-height: 98vh;
+  max-height: 75vh;
+  min-height: 75vh;
 }
 
 .product-configurator__gallery .pdp-overlay__content .pdp-carousel,
@@ -54,15 +54,15 @@
   max-height: unset;;
 }
 
-/* Increase actual image sizes */
-.product-configurator__gallery img {
+/* Production: Increase actual image sizes */
+.product-configurator__gallery:not(.hlx-sk-editing *) img {
   max-width: 100% !important;
-  max-height: 110vh !important;
-  min-height: 90vh !important;
+  max-height: 75vh !important;
+  min-height: 60vh !important;
   width: auto !important;
   height: auto !important;
   object-fit: contain;
-  transform: scale(1.4) !important;
+  transform: scale(1.2) !important;
   margin-top: 0 !important;
   pointer-events: none !important;
   user-select: none !important;
@@ -71,57 +71,93 @@
   -ms-user-select: none !important;
 }
 
+/* Universal Editor: Normal image sizes and interactions */
+.hlx-sk-editing .product-configurator__gallery img {
+  max-width: 100% !important;
+  max-height: 40vh !important;
+  min-height: auto !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  transform: none !important;
+  margin-top: 0 !important;
+  pointer-events: auto !important;
+  user-select: auto !important;
+  -webkit-user-select: auto !important;
+  -moz-user-select: auto !important;
+  -ms-user-select: auto !important;
+}
+
 /* Increase carousel container sizes */
 .product-configurator__gallery .pdp-carousel__main,
 .product-configurator__gallery .pdp-carousel__slides,
 .product-configurator__gallery .pdp-carousel__slide {
-  height: 95vh !important;
-  max-height: 95vh !important;
-  min-height: 95vh !important;
+  height: 70vh !important;
+  max-height: 70vh !important;
+  min-height: 70vh !important;
 }
 
 /* Increase thumbnail view container sizes */
 .product-configurator__gallery .pdp-carousel--thumbnailsRow .pdp-carousel__main,
 .product-configurator__gallery .pdp-carousel--thumbnailsRow .pdp-carousel__slides,
 .product-configurator__gallery .pdp-carousel--thumbnailsRow .pdp-carousel__slide {
-  height: 98vh !important;
-  max-height: 98vh !important;
-  min-height: 98vh !important;
+  height: 75vh !important;
+  max-height: 75vh !important;
+  min-height: 75vh !important;
 }
 
 /* Force gallery to take full column height */
 .product-configurator__left-column .product-configurator__gallery {
-  height: 120vh !important;
+  height: 80vh !important;
   overflow: visible;
   margin-top: 0 !important;
-  padding: var(--spacing-medium) 0;
+  padding: var(--spacing-small) 0;
 }
 
-/* Scale up the entire gallery container */
-.product-configurator__gallery {
-  transform: scale(1.3) !important;
+/* Scale up the entire gallery container - Production only */
+.product-configurator__gallery:not(.hlx-sk-editing *) {
+  transform: scale(1.1) !important;
   transform-origin: center center !important;
   margin-top: 0 !important;
   pointer-events: none !important;
 }
 
-/* Disable clicks on all gallery interactive elements */
-.product-configurator__gallery button,
-.product-configurator__gallery a,
-.product-configurator__gallery [role="button"],
-.product-configurator__gallery .pdp-carousel__nav,
-.product-configurator__gallery .pdp-carousel__button,
-.product-configurator__gallery .pdp-carousel__thumbnail,
-.product-configurator__gallery .pdp-carousel__slide {
+/* Universal Editor: Keep gallery interactive and normal size */
+.hlx-sk-editing .product-configurator__gallery button,
+.hlx-sk-editing .product-configurator__gallery a,
+.hlx-sk-editing .product-configurator__gallery [role="button"],
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__nav,
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__button,
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__thumbnail,
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__slide {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Production: Disable clicks on all gallery interactive elements */
+.product-configurator__gallery:not(.hlx-sk-editing *) button,
+.product-configurator__gallery:not(.hlx-sk-editing *) a,
+.product-configurator__gallery:not(.hlx-sk-editing *) [role="button"],
+.product-configurator__gallery:not(.hlx-sk-editing *) .pdp-carousel__nav,
+.product-configurator__gallery:not(.hlx-sk-editing *) .pdp-carousel__button,
+.product-configurator__gallery:not(.hlx-sk-editing *) .pdp-carousel__thumbnail,
+.product-configurator__gallery:not(.hlx-sk-editing *) .pdp-carousel__slide {
   pointer-events: none !important;
   cursor: default !important;
 }
 
-/* Disable gallery overlay and zoom functionality */
-.product-configurator__gallery .pdp-overlay,
-.product-configurator__gallery .pdp-overlay__trigger {
+/* Production: Disable gallery overlay and zoom functionality */
+.product-configurator__gallery:not(.hlx-sk-editing *) .pdp-overlay,
+.product-configurator__gallery:not(.hlx-sk-editing *) .pdp-overlay__trigger {
   pointer-events: none !important;
   cursor: default !important;
+}
+
+/* Universal Editor: Enable gallery overlay and zoom */
+.hlx-sk-editing .product-configurator__gallery .pdp-overlay,
+.hlx-sk-editing .product-configurator__gallery .pdp-overlay__trigger {
+  pointer-events: auto !important;
+  cursor: pointer !important;
 }
 
 
@@ -196,16 +232,106 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Universal Editor specific styles - simpler layout */
+.hlx-sk-editing .product-configurator__wrapper {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  grid-template-rows: auto !important;
+  gap: var(--spacing-medium) !important;
+  min-height: 60vh !important;
+  max-height: none !important;
+  padding: var(--spacing-medium) !important;
+  overflow: visible !important;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Universal Editor: Show a placeholder when no product is configured */
+.hlx-sk-editing .product-configurator__wrapper:empty::before {
+  content: "Product Configurator Block - Configure a SKU to see the product";
+  grid-column: 1 / -1;
+  padding: var(--spacing-big);
+  text-align: center;
+  background: #f9f9f9;
+  border: 2px dashed #ccc;
+  color: #666;
+  font-style: italic;
+}
+
+.hlx-sk-editing .product-configurator__gallery {
+  transform: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.hlx-sk-editing .product-configurator__gallery img {
+  transform: none !important;
+  max-height: 40vh !important;
+  min-height: auto !important;
+  pointer-events: auto !important;
+}
+
+.hlx-sk-editing .product-configurator__left-column,
+.hlx-sk-editing .product-configurator__right-column {
+  min-height: auto !important;
+  overflow: visible !important;
+  border: 2px dashed #ccc;
+  padding: var(--spacing-small);
+  position: relative;
+}
+
+/* Visual labels for Universal Editor */
+.hlx-sk-editing .product-configurator__left-column::before {
+  content: "Gallery Column";
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #f0f0f0;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #666;
+  z-index: 10;
+}
+
+.hlx-sk-editing .product-configurator__right-column::before {
+  content: "Product Details Column";
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #f0f0f0;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #666;
+  z-index: 10;
+}
+
+/* Universal Editor: Normal carousel heights */
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__main,
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__slides,
+.hlx-sk-editing .product-configurator__gallery .pdp-carousel__slide {
+  height: auto !important;
+  max-height: 40vh !important;
+  min-height: auto !important;
+}
+
+/* Production styles - enhanced layout */
 @media (min-width: 900px) {
   .product-configurator__wrapper {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 120vh;
+    grid-template-rows: 80vh;
     gap: var(--spacing-xxbig);
     position: relative;
-    min-height: 120vh;
+    min-height: 80vh;
     overflow: visible;
-    padding: var(--spacing-big) 0;
+    padding: var(--spacing-medium) 0;
+  }
+  
+  /* Override Universal Editor styles in production */
+  .product-configurator__wrapper:not(.hlx-sk-editing) {
+    grid-template-rows: 80vh;
+    min-height: 80vh;
   }
 
   .product-configurator__alert {
@@ -218,7 +344,7 @@
     grid-column: 1;
     grid-row: 1;
     display: block;
-    min-height: 120vh;
+    min-height: 80vh;
     overflow: visible;
   }
   
@@ -228,7 +354,7 @@
     grid-column: 2;
     grid-row: 1;
     display: block;
-    min-height: 120vh;
+    min-height: 80vh;
     overflow: visible;
   }
 
