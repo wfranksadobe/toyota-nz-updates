@@ -3,6 +3,10 @@
   grid-template-columns: repeat(var(--grid-1-columns), 1fr);
   grid-column-gap: var(--grid-1-gutters);
   margin-top: var(--spacing-medium);
+  transform: scale(1.3);
+  transform-origin: top center;
+  width: 100%;
+  margin-bottom: 30vh;
 }
 .product-configurator__header.dropin-design .pdp-header .pdp-header__sku {
   display: none;
@@ -228,6 +232,9 @@
     grid-template-columns: repeat(var(--grid-3-columns), 1fr);
     grid-column-gap: var(--grid-3-gutters);
     position: relative;
+    transform: scale(1.4);
+    transform-origin: top center;
+    margin-bottom: 40vh;
   }
 
   .product-configurator__alert {
@@ -239,6 +246,10 @@
     display: block;
     grid-column: 6 / span 6;
     margin-top: 50px;
+    transform: scale(1.2);
+    transform-origin: center center;
+    margin-left: 10%;
+    margin-right: -10%;
   }
   
   .product-configurator__right-column {
