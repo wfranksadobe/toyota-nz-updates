@@ -130,12 +130,22 @@ export default async function decorate(block) {
       <div class="product-configurator__alert"></div>
       <div class="product-configurator__wrapper">
         <div class="product-configurator__left-column">
-          <div class="product-configurator__gallery"></div>
+          <div class="product-configurator__gallery">
+            <div class="product-configurator__loader" style="display: none;">
+              <div class="product-configurator__loader-spinner"></div>
+              <p>Loading product images...</p>
+            </div>
+          </div>
         </div>
         <div class="product-configurator__right-column">
           <div class="product-configurator__header"></div>
           <div class="product-configurator__price"></div>
-          <div class="product-configurator__gallery"></div>
+          <div class="product-configurator__gallery">
+            <div class="product-configurator__loader" style="display: none;">
+              <div class="product-configurator__loader-spinner"></div>
+              <p>Loading product images...</p>
+            </div>
+          </div>
           <div class="product-configurator__short-description"></div>
           <div class="product-configurator__configuration">
             <div class="product-configurator__options"></div>
@@ -354,8 +364,28 @@ export default async function decorate(block) {
       addToCart.setProps((prev) => ({ ...prev, disabled: !valid }));
     }, { eager: true });
 
+    // Get loader elements
+    const $loaders = fragment.querySelectorAll('.product-configurator__loader');
+    
+    // Helper function to show loaders
+    const showLoaders = () => {
+      $loaders.forEach(loader => {
+        loader.style.display = 'flex';
+      });
+    };
+    
+    // Helper function to hide loaders
+    const hideLoaders = () => {
+      $loaders.forEach(loader => {
+        loader.style.display = 'none';
+      });
+    };
+
     // Handle option changes
     events.on('pdp/values', () => {
+      // Show loader when options change
+      showLoaders();
+      
       if (wishlistToggleBtn) {
         const configValues = pdpApi.getProductConfigurationValues();
 
@@ -373,6 +403,11 @@ export default async function decorate(block) {
           },
         }));
       }
+      
+      // Hide loader after a short delay to allow gallery to update
+      setTimeout(() => {
+        hideLoaders();
+      }, 1000);
     }, { eager: true });
 
     events.on('wishlist/alert', ({ action, item }) => {
