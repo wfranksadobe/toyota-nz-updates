@@ -132,7 +132,7 @@ async function applyChanges(event) {
   return false;
 }
 
-function attachEventListners(main) {
+async function attachEventListners(main) {
   [
     'aue:content-patch',
     'aue:content-update',
@@ -148,9 +148,9 @@ function attachEventListners(main) {
     } else {
       window.location.reload();
     }
-    const module = await import('./form-editor-support.js');
-      module.attachEventListners(main);
   }));
+  const module = await import('./form-editor-support.js');
+      module.attachEventListners(main);
 }
 
 attachEventListners(document.querySelector('main'));
