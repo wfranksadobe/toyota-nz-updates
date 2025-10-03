@@ -73,8 +73,40 @@ export default function decorate(block) {
     type: config.buttonType || config.buttontype || 'primary'
   };
   
+  // Debug: Log button data to console
+  console.log('Hero button data:', buttonData);
+  console.log('Hero config:', config);
+  
   if (buttonData.text && buttonData.link) {
-    createHeroButton(col, buttonData);
+    createHeroButton(block, buttonData);
+  } else {
+    // Look for button data in the content as a fallback
+    const allText = block.textContent;
+    console.log('All text content for button search:', allText);
+    
+    // Look for simple text patterns that might be button data
+    const paragraphs = block.querySelectorAll('p');
+    console.log('Found paragraphs:', paragraphs.length);
+    
+    if (paragraphs.length >= 2) {
+      const buttonText = paragraphs[0].textContent.trim();
+      const buttonLink = paragraphs[1].textContent.trim();
+      
+      // Check if these look like button data (not empty, not too long)
+      if (buttonText && buttonLink && buttonText.length < 50 && buttonLink.length < 100) {
+        const extractedButtonData = {
+          text: buttonText,
+          link: buttonLink,
+          type: 'primary'
+        };
+        console.log('Found button data in paragraphs:', extractedButtonData);
+        createHeroButton(block, extractedButtonData);
+        
+        // Hide the paragraphs that contain button data
+        paragraphs[0].style.display = 'none';
+        paragraphs[1].style.display = 'none';
+      }
+    }
   }
 }
 
@@ -95,11 +127,11 @@ function extractButtonData(col) {
 
 /**
  * Create and append a hero button
- * @param {Element} col - The hero column element
+ * @param {Element} block - The hero block element
  * @param {Object} buttonData - Button configuration
  */
-function createHeroButton(col, buttonData) {
-  const existingButtonWrapper = col.querySelector('.hero-button-wrapper');
+function createHeroButton(block, buttonData) {
+  const existingButtonWrapper = block.querySelector('.hero-button-wrapper');
   if (existingButtonWrapper) {
     existingButtonWrapper.remove();
   }
@@ -119,5 +151,5 @@ function createHeroButton(col, buttonData) {
   });
   
   buttonWrapper.appendChild(button);
-  col.appendChild(buttonWrapper);
+  block.appendChild(buttonWrapper);
 }

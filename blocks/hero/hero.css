@@ -64,14 +64,14 @@
 }
 
 .hero .button.primary {
-  background-color: var(--color-brand-700);
+  background-color: rgb(235, 10, 30);
   color: var(--color-neutral-50);
-  border-color: var(--color-brand-700);
+  border-color: rgb(235, 10, 30);
 }
 
 .hero .button.primary:hover {
-  background-color: var(--color-brand-800);
-  border-color: var(--color-brand-800);
+  background-color: rgb(200, 8, 25);
+  border-color: rgb(200, 8, 25);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
