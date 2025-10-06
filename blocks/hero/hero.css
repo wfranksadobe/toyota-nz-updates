@@ -1,99 +1,93 @@
 .hero-container .hero-wrapper {
   max-width: unset;
   padding: 0;
+  width: 100vw;
+  margin: 0;
 }
 
 .hero {
   position: relative;
-  padding: 40px 24px;
-  margin-top: 30px;
-  width: 100%;
+  padding: 0;
+  margin: 0;
+  width: 100vw;
   overflow: hidden;
-  min-height: 50vh;
+  display: block;
 }
 
 .hero h1 {
   position: absolute;
-  bottom: 33%;
+  top: 67%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   max-width: 1200px;
   width: calc(100% - 48px);
   color: var(--background-color);
   text-align: center;
   margin: 0;
+  padding: 0 24px;
+  z-index: 2;
 }
 
 .hero p {
   position: absolute;
-  bottom: 28%;
+  top: 72%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   max-width: 1200px;
   width: calc(100% - 48px);
   color: var(--background-color);
   text-align: center;
   margin: 0;
+  padding: 0 24px;
+  z-index: 2;
 }
 
 .hero picture {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  object-fit: contain;
-  box-sizing: border-box;
+  position: relative;
+  display: block;
   width: 100%;
-  height: 100%;
   background-color: #fff;
 }
 
 .hero img {
-  object-fit: contain;
   width: 100%;
-  height: 100%;
-  min-width: 100%;
-  min-height: 100%;
+  height: auto;
+  display: block;
 }
 
-/* Make hero height responsive to viewport */
-@media (min-width: 768px) {
-  .hero {
-    min-height: 60vh;
-  }
-}
-
-@media (min-width: 1024px) {
-  .hero {
-    min-height: 70vh;
-  }
-}
 
 /* Hero Button Styling */
 .hero-button-wrapper {
   position: absolute;
-  bottom: 24%;
+  top: 76%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   max-width: 1200px;
   width: calc(100% - 48px);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0 24px;
+  z-index: 2;
 }
 
 .hero .button {
-  font: var(--type-body-1-strong-font);
-  letter-spacing: var(--type-body-1-strong-letter-spacing);
-  padding: 12px 24px;
+  font-family: var(--body-font-family) !important;
+  font-size: 1.6rem !important;
+  font-weight: 600 !important;
+  letter-spacing: var(--type-body-1-strong-letter-spacing) !important;
+  padding: 12px 29px !important;
+  line-height: 1.2 !important;
   border-radius: var(--shape-border-radius-2);
   text-decoration: none;
-  display: inline-block;
+  display: inline-block !important;
   cursor: pointer;
   transition: all 0.3s ease;
   border: 2px solid transparent;
-  font-weight: 600;
-  text-align: center;
-  min-width: 120px;
+  text-align: center !important;
+  min-width: 200px;
+  box-sizing: border-box;
+  vertical-align: baseline !important;
 }
 
 .hero .button.primary {
@@ -129,25 +123,28 @@
 
 @media (min-width: 900px) {
   .hero {
-    padding: 40px 32px;
+    padding: 40px 0;
   }
   
   .hero h1 {
     width: calc(100% - 64px);
+    padding: 0 32px;
   }
   
   .hero p {
     width: calc(100% - 64px);
+    padding: 0 32px;
   }
   
   .hero-button-wrapper {
     width: calc(100% - 64px);
+    padding: 0 32px;
   }
   
   .hero .button {
-    padding: 16px 32px;
+    padding: 14px 37px !important;
     font-size: 1.1em;
-    min-width: 140px;
+    min-width: 220px;
   }
 }
 
@@ -157,7 +154,8 @@
   }
   
   .hero .button {
-    width: 100%;
-    max-width: 280px;
+    width: auto;
+    max-width: 350px;
+    min-width: 200px;
   }
 }
