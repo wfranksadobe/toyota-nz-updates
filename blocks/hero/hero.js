@@ -88,9 +88,11 @@ export default function decorate(block) {
     const paragraphs = block.querySelectorAll('p');
     console.log('Found paragraphs:', paragraphs.length);
     
+    // Look for button data in the last two paragraphs instead of first two
     if (paragraphs.length >= 2) {
-      const buttonText = paragraphs[0].textContent.trim();
-      const buttonLink = paragraphs[1].textContent.trim();
+      const lastTwo = Array.from(paragraphs).slice(-2);
+      const buttonText = lastTwo[0].textContent.trim();
+      const buttonLink = lastTwo[1].textContent.trim();
       
       // Check if these look like button data (not empty, not too long)
       if (buttonText && buttonLink && buttonText.length < 50 && buttonLink.length < 100) {
@@ -103,8 +105,8 @@ export default function decorate(block) {
         createHeroButton(block, extractedButtonData);
         
         // Hide the paragraphs that contain button data
-        paragraphs[0].style.display = 'none';
-        paragraphs[1].style.display = 'none';
+        lastTwo[0].style.display = 'none';
+        lastTwo[1].style.display = 'none';
       }
     }
   }
