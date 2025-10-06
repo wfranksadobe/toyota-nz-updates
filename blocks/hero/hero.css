@@ -16,7 +16,7 @@
 
 .hero h1 {
   position: absolute;
-  top: 67%;
+  top: 70%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1200px;
@@ -30,7 +30,7 @@
 
 .hero p {
   position: absolute;
-  top: 73%;
+  top: 76%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1200px;
@@ -45,19 +45,19 @@
 }
 
 .hero p:nth-of-type(2) {
-  top: 76%;
+  top: 79%;
 }
 
 .hero p:nth-of-type(3) {
-  top: 80%;
-}
-
-.hero p:nth-of-type(4) {
   top: 82%;
 }
 
+.hero p:nth-of-type(4) {
+  top: 85%;
+}
+
 .hero p:nth-of-type(5) {
-  top: 84%;
+  top: 88%;
 }
 
 .hero picture {
@@ -77,7 +77,7 @@
 /* Hero Button Styling */
 .hero-button-wrapper {
   position: absolute;
-  top: 79%;
+  top: 82%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1200px;
@@ -141,7 +141,7 @@
 
 @media (min-width: 900px) {
   .hero {
-    padding: 40px 0;
+    padding: 0;
   }
   
   .hero h1 {
@@ -151,7 +151,7 @@
   
   .hero p {
     width: calc(100% - 64px);
-    padding: 0 32px;
+    padding: 20px 32px;
   }
   
   .hero-button-wrapper {
