@@ -10,13 +10,14 @@
   padding: 0;
   margin: 0;
   width: 100vw;
+  height: 900px;
   overflow: hidden;
   display: block;
 }
 
 .hero h1 {
   position: absolute;
-  top: 70%;
+  top: 65%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1200px;
@@ -30,7 +31,7 @@
 
 .hero p {
   position: absolute;
-  top: 76%;
+  top: 75%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1200px;
@@ -45,31 +46,34 @@
 }
 
 .hero p:nth-of-type(2) {
-  top: 79%;
+  top: 80%;
 }
 
 .hero p:nth-of-type(3) {
-  top: 82%;
+  top: 84%;
 }
 
 .hero p:nth-of-type(4) {
-  top: 85%;
-}
-
-.hero p:nth-of-type(5) {
   top: 88%;
 }
 
+.hero p:nth-of-type(5) {
+  top: 92%;
+}
+
 .hero picture {
-  position: relative;
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
   background-color: #fff;
 }
 
 .hero img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
 }
 
@@ -77,7 +81,7 @@
 /* Hero Button Styling */
 .hero-button-wrapper {
   position: absolute;
-  top: 82%;
+  top: 87%;
   left: 50%;
   transform: translate(-50%, -50%);
   max-width: 1200px;
@@ -166,14 +170,84 @@
   }
 }
 
-@media (max-width: 768px) {
+/* Tablet Landscape - Start reducing text size and spacing */
+@media (max-width: 1024px) {
+  .hero h1 {
+    font-size: 2.8rem;
+    top: 67%;
+  }
+  
+  .hero p {
+    font-size: 2.4rem;
+    top: 77%;
+  }
+  
   .hero-button-wrapper {
+    top: 85%;
+  }
+  
+  .hero .button {
+    padding: 12px 32px !important;
+    font-size: 1rem !important;
+    min-width: 180px;
+  }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.2rem;
+    top: 70%;
+  }
+  
+  .hero p {
+    font-size: 1.8rem;
+    padding: 15px 24px;
+    top: 78%;
+  }
+  
+  .hero-button-wrapper {
+    top: 84%;
     justify-content: center;
   }
   
   .hero .button {
-    width: auto;
-    max-width: 350px;
-    min-width: 200px;
+    padding: 10px 28px !important;
+    font-size: 0.95rem !important;
+    min-width: 160px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .hero {
+    height: 600px;
+  }
+  
+  .hero h1 {
+    font-size: 1.8rem;
+    width: calc(100% - 32px);
+    padding: 0 16px;
+    top: 72%;
+  }
+  
+  .hero p {
+    font-size: 1.4rem;
+    padding: 12px 16px;
+    width: calc(100% - 32px);
+    top: 80%;
+  }
+  
+  .hero-button-wrapper {
+    width: calc(100% - 32px);
+    padding: 0 16px;
+    top: 86%;
+  }
+  
+  .hero .button {
+    padding: 8px 24px !important;
+    font-size: 0.9rem !important;
+    min-width: 140px;
+    max-width: 200px;
   }
 }
