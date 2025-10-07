@@ -5,6 +5,7 @@
     "/content/toyota_demo/configuration:/.helix/config.json",
     "/content/toyota_demo/headers:/.helix/headers.json",
     "/content/toyota_demo/metadata:/metadata.json",
+    "/content/toyota_demo/redirects:/redirects.json",
     "/content/toyota_demo.resource/enrichment/enrichment.json:/enrichment/enrichment.json"
   ],
   "includes": [
